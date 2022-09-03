@@ -184,7 +184,7 @@ new Vue({
 	  let  p5 = 1 - this.getGaussianPercent(this.annualIncome,11.1,300);
 	  let  p6 = 1 - this.getGaussianPercent(this.parent,2,1);
 	  let  p = p1*p2*p3*p4*p5*p6;
-      return p3;
+      return p.toFixed(8);
     },
     femaleNum() {//女性人数
       let  p11 = this.getGaussianPercent(this.age,30,240);
