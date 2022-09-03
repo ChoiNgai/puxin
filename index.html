@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<title>男女比例计算器</title>
+<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+<body>
+<div v-cloak class="calculate">
+  <ul class="calc-result flex-60">
+    <li>
+      <h6>男性比例</h6>
+      <h2 class="number">{{male}}</h2>
+	  <h6 class="text-grey">全国男性符合条件人数估计</h6>
+	  <h2 class="number text-grey">{{maleNum}}</h2>
+    </li>
+    <li>
+      <h6>女性比例</h6>
+      <h2 class="number">{{female}}</h2>
+	  <h6 class="text-grey">全国女性符合条件人数估计</h6>
+	  <h2 class="number text-grey"> {{femaleNum}} </h2>
+    </li>
+  </ul>
+  <div class="progress-part flex-60">
+    <!--分隔符-->
+	<h6>年龄</h6>
+	<h4 class="number">{{age}}~{{age*1.2}}</h4>
+	<div ref="progress" class="progress flex-60">
+	  <span class="pro-percent" :style="'width:'+agePercent+'%'"></span>
+	  <p
+	    class="pro-mask"
+	    id="age"
+	    @touchstart.stop="onTouchEvent"
+	    @touchmove.stop="onTouchEvent"
+	    @mousedown.stop.prevent="onMouseEvent"
+	  ></p>
+	</div>
+	
+	<h6>颜值</h6>
+    <h4 class="number">{{levelofAppearance}}</h4>
+    <div ref="progress" class="progress flex-60">
+      <span class="pro-percent" :style="'width:'+levelofAppearancePercent+'%'"></span>
+      <p
+        class="pro-mask"
+        id="levelofAppearance"
+        @touchstart.stop="onTouchEvent"
+        @touchmove.stop="onTouchEvent"
+        @mousedown.stop.prevent="onMouseEvent"
+      ></p>
+    </div>
+	
+	<h6>身高</h6>
+    <h4 class="number">{{humanheight}}</h4>
+    <div ref="progress" class="progress flex-60">
+      <span class="pro-percent" :style="'width:'+humanheightPercent+'%'"></span>
+      <p
+        class="pro-mask"
+        id="humanheight"
+        @touchstart.stop="onTouchEvent"
+        @touchmove.stop="onTouchEvent"
+        @mousedown.stop.prevent="onMouseEvent"
+      ></p>
+    </div>
+	
+	<h6>学历</h6>
+    <h4 class="number">{{education}}</h4>
+    <div ref="progress" class="progress flex-60">
+      <span class="pro-percent" :style="'width:'+educationPercent+'%'"></span>
+	  <!-- <span class="lowest-apr">9%: 带专</span> -->
+      <p
+        class="pro-mask"
+        id="education"
+        @touchstart.stop="onTouchEvent"
+        @touchmove.stop="onTouchEvent"
+        @mousedown.stop.prevent="onMouseEvent"
+      ></p>
+    </div>
+	
+    <h6>年收入</h6>
+    <h4 class="number">{{annualIncome}}w</h4>
+    <div ref="progress" class="progress flex-60">
+      <span class="pro-percent" :style="'width:'+annualIncomePercent+'%'"></span>
+      <p
+        class="pro-mask"
+        id="annualIncome"
+        @touchstart.stop="onTouchEvent"
+        @touchmove.stop="onTouchEvent"
+        @mousedown.stop.prevent="onMouseEvent"
+      ></p>
+    </div>
+	
+<!-- 	<h6>家境</h6>
+	<h4 class="number">{{parent}}</h4>
+	<div ref="progress" class="progress flex-60">
+	  <span class="pro-percent" :style="'width:'+parentPercent+'%'"></span>
+	  <p
+	    class="pro-mask"
+	    id="parent"
+	    @touchstart.stop="onTouchEvent"
+	    @touchmove.stop="onTouchEvent"
+	    @mousedown.stop.prevent="onMouseEvent"
+	  ></p>
+	</div> -->
+	<!--分隔符-->
+  </div>
+</div>
+<script src="js/vue.js"></script>
+<script src="js/bignumber.js"></script>
+<script src="js/box-muller.js"></script>
+<script src="js/gaussian.js"></script>
+<script>
+new Vue({
+  el:".calculate",
+  data() {
+    return {
+	  age: "22", // 年龄
+	  maxAge: "50", // 最高年龄
+	  minAge: "20", // 最小年龄
+	  agePercent: "", // 年龄百分比
+	  ageStep: 1, // 年龄滑动的最小步数
+		
+	  levelofAppearance: "6", // 颜值
+	  maxLevelofAppearance: "10", // 最高颜值
+	  levelofAppearancePercent: "", // 颜值百分比
+	  levelofAppearanceStep: 0.5, // 颜值滑动的最小步数
+		
+	  humanheight: "160", 		// 身高
+	  maxHumanheight: "190", 	// 最大身高
+	  minHumanheight: "140", 	// 最小身高
+	  humanheightPercent: "", 	// 身高比例
+	  humanheightStep: 1, 		// 身高每次滑动的最小步数
+	  
+	  education: "8",//学历
+	  maxEducation: "10", //最高学历
+	  educationPercent: "",//学历百分比
+	  educationStep: 1, // 学历每次滑动的最小步数
+	  
+	  annualIncome: "20", // 年收入
+	  maxAnnualIncome: "80", // 最大年收入
+	  annualIncomePercent: "", // 年收入百分比
+	  annualIncomeStep: 5, // 年收入每次滑动的最小步数
+	  
+	  parent: "0",			//家境		不好量化，废弃，当作100%
+	  maxParent: "5",		//最大家境条件
+	  parentPercent: "",	//家境百分比
+	  parentStep: 1,  //家境每次滑动的最小步数
+	  
+      touchx: 0
+    };
+  },
+  computed: {
+    male() {// 男性比例
+	  let  p11 = this.getGaussianPercent(this.age,30,240);
+	  let  p12 = this.getGaussianPercent(this.age*1.2,30,240);
+	  let  p1 = p12-p11;	//计算年龄段
+	  let  p2 = 1 - this.getGaussianPercent(this.humanheight,169,17);
+	  let  p3 = 1 - this.getGaussianPercent(this.education,5,2);
+	  let  p4 = 1 - this.getGaussianPercent(this.annualIncome,12.7,300);
+	  let  p5 = 1 - this.getGaussianPercent(this.parent,2,1);
+	  let  p  = p1*p2*p3*p4*p5;
+      return p.toFixed(8);
+    },
+    maleNum() {// 男性人数
+	  let  p11 = this.getGaussianPercent(this.age,30,240);
+	  let  p12 = this.getGaussianPercent(this.age*1.2,30,240);
+	  let  p1 = p12-p11;	//计算年龄段
+	  let  p2 = 1 - this.getGaussianPercent(this.humanheight,169,17);
+	  let  p3 = 1 - this.getGaussianPercent(this.education,5,2);
+	  let  p4 = 1 - this.getGaussianPercent(this.annualIncome,12.7,300);
+	  let  p5 = 1 - this.getGaussianPercent(this.parent,2,1);
+	  let  num  = p1*p2*p3*p4*p5*(689050000+34900000);	//全国男性比女性多3490万人
+      return num.toFixed(0);
+    },
+    female() {// 女性比例
+      let  p11 = this.getGaussianPercent(this.age,30,240);
+	  let  p12 = this.getGaussianPercent(this.age*1.2,30,240);
+	  let  p1 = p12-p11;	//计算年龄段
+	  let  p2 = 1 - this.getGaussianPercent(this.levelofAppearance,5-1,1.3);	//女性看男性的平均颜值普遍会认为丑，所以均值5-1
+	  let  p3 = 1 - this.getGaussianPercent(this.humanheight,160,12);
+	  let  p4 = 1 - this.getGaussianPercent(this.education,5,2);
+	  let  p5 = 1 - this.getGaussianPercent(this.annualIncome,11.1,300);
+	  let  p6 = 1 - this.getGaussianPercent(this.parent,2,1);
+	  let  p = p1*p2*p3*p4*p5*p6;
+      return p3;
+    },
+    femaleNum() {//女性人数
+      let  p11 = this.getGaussianPercent(this.age,30,240);
+  	  let  p12 = this.getGaussianPercent(this.age*1.2,30,240);
+  	  let  p1 = p12-p11;	//计算年龄段
+  	  let  p2 = 1 - this.getGaussianPercent(this.levelofAppearance,5-1,1.3);	//女性看男性的平均颜值普遍会认为丑，所以均值5-1
+  	  let  p3 = 1 - this.getGaussianPercent(this.humanheight,160,12);
+  	  let  p4 = 1 - this.getGaussianPercent(this.education,5,2);
+  	  let  p5 = 1 - this.getGaussianPercent(this.annualIncome,11.1,300);
+  	  let  p6 = 1 - this.getGaussianPercent(this.parent,2,1);
+  	  let  num = p1*p2*p3*p4*p5*p6*6689050000;;
+      return num.toFixed(0);
+    }
+  },
+  created() {
+    this.getAnnualIncomePercent();
+    this.getLevelofAppearancePercent();
+	this.getEducationPercent();
+	this.getHumanheightPercent();
+	this.getparentPercent();
+	this.getagePercent();
+  },
+  methods: {
+	//正态累计分布函数计算
+	getGaussianPercent(x,mean,sigma){
+		// var gaussian = request('./js/gaussian');
+		// var distribution = gaussian(mean,sigma);
+		var distribution = new gaussian(mean,sigma);
+		var sample = distribution.cdf(x);
+		return sample
+	},
+	// //正态分布比例计算
+	// getNPercent(x,u,sigma2) {
+	// 	var sigma = Math.sqrt(sigma2);
+	// 	var e = Math.E;
+	// 	var pi = Math.PI;
+	// 	var leftValue = 1/( Math.sqrt(2*pi) * sigma);
+	// 	var xu = x-u;
+	// 	var xu2 = Math.pow(xu,2);
+	// 	var rightValue = - xu2/(2*Math.pow(sigma,2));
+	// 	let percent = leftValue * Math.pow(e,rightValue);
+	// 	return percent
+	// },
+	
+	// 计算年龄
+	getAge() {
+	  // 计算百分比
+	  let p = new BigNumber(this.touchx)
+	    .div(this.$refs.progress.offsetWidth)
+	    .times(this.maxAge)
+	    .idiv(this.ageStep) //整除，保留0位小数
+	    .div(this.maxAge)
+	    .times(this.ageStep)
+	    .times(100)
+	    .toFixed(0);
+	
+	  this.agePercent = p - 0 > 100 ? 100 : p;
+	
+	  let num = new BigNumber(this.agePercent)
+	    .div(100)
+	    .times(this.maxAge)
+	    .toFixed(0);
+		
+	  this.age = num - 0 > this.maxAge ? this.maxAge : num;
+	  this.age = num - 0 < this.minAge ? this.minAge : num;
+	
+	},
+    // 计算年龄段百分比
+    getagePercent() {
+      let p = new BigNumber(this.age)
+        .div(this.maxAge)
+        .times(100)
+        .toFixed(2);
+      this.agePercent = p - 0 > 100 ? 100 : p;
+	  
+    },
+	
+	// 计算颜值
+	getLevelofAppearance() {
+	  // 计算百分比
+	  let p = new BigNumber(this.touchx)
+	    .div(this.$refs.progress.offsetWidth)
+	    .times(this.maxLevelofAppearance)
+	    .idiv(this.levelofAppearanceStep) //整除，保留0位小数
+	    .div(this.maxLevelofAppearance)
+	    .times(this.levelofAppearanceStep)
+	    .times(100)
+	    .toFixed(1);
+	
+	  this.levelofAppearancePercent = p - 0 > 100 ? 100 : p;
+	
+	  let num = new BigNumber(this.levelofAppearancePercent)
+	    .div(100)
+	    .times(this.maxLevelofAppearance)
+	    .toFixed(1);
+		
+	  this.levelofAppearance = num - 0 > this.maxLevelofAppearance ? this.maxLevelofAppearance : num;
+	
+	},
+    // 计算颜值前百分比
+    getLevelofAppearancePercent() {
+      let p = new BigNumber(this.levelofAppearance)
+        .div(this.maxLevelofAppearance)
+        .times(100)
+        .toFixed(2);
+      this.levelofAppearancePercent = p - 0 > 100 ? 100 : p;
+	  
+    },
+	
+	
+	// 计算身高
+	getHumanheight() {
+	  // 计算百分比
+	  let p = new BigNumber(this.touchx)
+	    .div(this.$refs.progress.offsetWidth)
+	    .times(this.maxHumanheight)
+	    .idiv(this.humanheightStep) //整除，保留0位小数
+	    .div(this.maxHumanheight)
+	    .times(this.humanheightStep)
+	    .times(100)
+	    .toFixed(1);
+	
+	  this.humanheightPercent = p - 0 > 100 ? 100 : p;
+	
+	  let num = new BigNumber(this.humanheightPercent)
+	    .div(100)
+	    .times(this.maxHumanheight)
+	    .toFixed(0);
+		
+	  this.humanheight = num - 0 > this.maxHumanheight ? this.maxHumanheight : num;
+	  this.humanheight = num - 0 < this.minHumanheight ? this.minHumanheight : num;
+	
+	},
+    // 计算身高前百分比
+    getHumanheightPercent() {
+      let p = new BigNumber(this.humanheight)
+        .div(this.maxHumanheight)
+        .times(100)
+        .toFixed(0);
+      this.humanheightPercent = p - 0 > 100 ? 100 : p;
+	  
+    },
+	
+	// 计算学历
+	getEducation() {
+	  // 计算百分比
+	  let p = new BigNumber(this.touchx)
+        .div(this.$refs.progress.offsetWidth)
+        .times(this.maxEducation)
+        .idiv(this.educationStep) //整除，保留0位小数
+        .div(this.maxEducation)
+        .times(this.educationStep)
+        .times(100)
+        .toFixed(0);
+	
+	  this.educationPercent = p - 0 > 100 ? 100 : p;
+	
+	  let num = new BigNumber(this.educationPercent)
+	    .div(100)
+	    .times(this.maxEducation)
+	    .toFixed(0);
+		
+	  this.education = num - 0 > this.maxEducation ? this.maxEducation : num;
+	},
+    // 计算学历前百分比
+    getEducationPercent() {
+      let p = new BigNumber(this.education)
+        .div(this.maxEducation)
+        .times(100)
+        .toFixed(0);
+      this.educationPercent = p - 0 > 100 ? 100 : p;
+	  
+    },
+	
+	// 计算年收入
+	getAnnualIncome() {
+	  // 计算百分比
+	  let p = new BigNumber(this.touchx)
+	    .div(this.$refs.progress.offsetWidth)
+	    .times(this.maxAnnualIncome)
+	    .idiv(this.annualIncomeStep) //整除，保留0位小数
+	    .div(this.maxAnnualIncome)
+	    .times(this.annualIncomeStep)
+	    .times(100)
+	    .toFixed(2);
+	
+	  this.annualIncomePercent = p - 0 > 100 ? 100 : p;
+	
+	  let num = new BigNumber(this.annualIncomePercent)
+	    .div(100)
+	    .times(this.maxAnnualIncome)
+	    .toFixed(0);			//小数点数
+	  
+	  this.annualIncome = num - 0 > this.maxAnnualIncome ? this.maxAnnualIncome : num;
+	},
+	// 计算年收入前百分比
+	getAnnualIncomePercent() {
+	
+	  let p = new BigNumber(this.annualIncome)
+	    .div(this.maxAnnualIncome)
+	    .times(100)
+	    .toFixed(2);
+	  this.annualIncomePercent = p - 0 > 100 ? 100 : p;
+	
+	},
+	
+	
+	// 计算家境
+	getParent() {
+	  // 计算百分比
+	  let p = new BigNumber(this.touchx)
+	    .div(this.$refs.progress.offsetWidth)
+	    .times(this.maxParent)
+	    .idiv(this.parentStep) //整除，保留0位小数
+	    .div(this.maxParent)
+	    .times(this.parentStep)
+	    .times(100)
+	    .toFixed(2);
+	
+	  this.parentPercent = p - 0 > 100 ? 100 : p;
+	
+	  let num = new BigNumber(this.parentPercent)
+	    .div(100)
+	    .times(this.maxParent)
+	    .toFixed(0);			//小数点数
+	  
+	  this.parent = num - 0 > this.maxParent ? this.maxParent : num;
+	},
+	// 计算家境前百分比
+	getparentPercent() {
+	
+	  let p = new BigNumber(this.parent)
+	    .div(this.maxParent)
+	    .times(100)
+	    .toFixed(2);
+	  this.parentPercent = p - 0 > 100 ? 100 : p;
+	
+	},
+	
+    // 通过移动滑块计算数值
+    computedAmount(type = "annualIncome") {
+      this.touchx = this.touchx > 0 ? this.touchx : 0;
+	  if (type == "age") {
+	    this.getAge();
+	  }
+      else if (type == "levelofAppearance") {
+        this.getLevelofAppearance();
+      } 
+	  else if (type == "education")
+	  {
+	    this.getEducation();
+	  }
+	  else if (type == "humanheight")
+	  {
+	    this.getHumanheight();
+	  }
+	  else if (type == "annualIncome") {
+	    this.getAnnualIncome();
+	  }
+	  else if (type == "parent") {
+	    this.getParent();
+	  }
+	  else {
+		// 无事发生
+      }
+    },
+
+    /* ------ 下面部分才是滑块js 以上是计算器js ------ */
+
+    // 移动端事件
+    onTouchEvent(e) {
+      this.touchx = e.touches[0].pageX - 40;
+      this.computedAmount(e.target.id);
+    },
+    // pc 端事件
+    onMouseEvent(e) {
+      this.touchx = event.offsetX - 12;
+      this.computedAmount(e.target.id);
+      document.onmousemove = event => {
+        if (event.target.className == "pro-mask") {
+          this.touchx = event.offsetX - 12;
+          this.computedAmount(e.target.id);
+        }
+      };
+      document.onmouseup = () => {
+        document.onmousemove = document.onmouseup = null;
+      };
+    }
+  }
+})
+</script>
+</body>
+
+</html>

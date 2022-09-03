@@ -1,0 +1,140 @@
+[v-cloak] {
+    display: none;
+}
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+ul,li{
+  list-style: none;
+}
+:root {
+  --blueColor: #0076ff;
+  --bgColor:rgba(230, 246, 255, 0.5);
+  --progressColor:rgba(0, 120, 255, 0.1);
+}
+.text-grey {
+  color: rgba(0, 0, 0, 0.4)!important;
+}
+.flex-60 {
+  width: 60%;
+}
+.calculate {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  margin:40px auto;
+}
+.calc-result {
+  padding: 64px 20px;
+  text-align: center;
+  display: flex;
+  background: #fff;
+  box-shadow: 0 10px 19px 0 rgba(0, 0, 0, 0.1);
+}
+.calc-result li {
+  width: 50%;
+}
+.calc-result .number {
+  margin: 16px 0;
+}
+.number {
+  color: var(--blueColor);
+}
+.progress-part {
+  background: var(--bgColor);
+  padding: 0 48px 154px;
+  user-select: none;
+}
+.progress-part h6 {
+  padding-top: 80px;
+}
+.progress-part .number {
+  margin-bottom: 14px;
+}
+.progress {
+  position: relative;
+  height: 4px;
+  background: var(--progressColor);
+}
+.pro-mask {
+  position: absolute;
+  left: -12px;
+  right: -12px;
+  height: 150px;
+  top: -50px;
+  z-index: 10;
+}
+.lowest-apr {
+  position: absolute;
+  left: calc(26.7% - 6px);
+  top: 44px;
+  color: rgba(0, 120, 255, 0.7);
+  font-size: 12px;
+  line-height: 16px;
+}
+.lowest-apr:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -48px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(0, 120, 255, 0.3);
+}
+.lowest-apr:after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: -34px;
+  height: 32px;
+  width: 1px;
+  background: rgba(0, 120, 255, 0.3);
+}
+.pro-percent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: var(--blueColor);
+  z-index: 2;
+}
+.pro-percent:after {
+  content: "";
+  position: absolute;
+  right: -12px;
+  top: -10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--blueColor);
+}
+@media (min-width: 768px) {
+  .calc-result {
+    position: absolute;
+    right: 0;
+    top: 80px;
+  }
+}
+@media (max-width: 767px) {
+  .flex-60 {
+    width: 100%;
+  }
+  .progress-part {
+    padding: 0 20px 94px;
+  }
+  .progress-part h6:first-of-type {
+    padding-top: 40px;
+  }
+  .calc-result {
+    padding: 24px 0;
+  }
+  .pro-percent:after {
+    width: 16px;
+    height: 16px;
+    right: -8px;
+    top: -6px;
+  }
+}
