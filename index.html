@@ -27,7 +27,7 @@
   <div class="progress-part flex-60">
     <!--分隔符-->
 	<h6>年龄</h6>
-	<h4 class="number">{{age}}~{{age*1.2}}</h4>
+	<h4 class="number">{{age}}~{{age2}}</h4>
 	<div ref="progress" class="progress flex-60">
 	  <span class="pro-percent" :style="'width:'+agePercent+'%'"></span>
 	  <p
@@ -117,6 +117,7 @@ new Vue({
   data() {
     return {
 	  age: "22", // 年龄
+	  age2: "26", // 年龄2
 	  maxAge: "50", // 最高年龄
 	  minAge: "20", // 最小年龄
 	  agePercent: "", // 年龄百分比
@@ -124,6 +125,7 @@ new Vue({
 		
 	  levelofAppearance: "6", // 颜值
 	  maxLevelofAppearance: "10", // 最高颜值
+	  minLevelofAppearance: "1", // 最低颜值
 	  levelofAppearancePercent: "", // 颜值百分比
 	  levelofAppearanceStep: 0.5, // 颜值滑动的最小步数
 		
@@ -250,7 +252,8 @@ new Vue({
 		
 	  this.age = num - 0 > this.maxAge ? this.maxAge : num;
 	  this.age = num - 0 < this.minAge ? this.minAge : num;
-	
+	  
+	  this.age2 = new BigNumber(this.age).times(1.2).toFixed(0);
 	},
     // 计算年龄段百分比
     getagePercent() {
@@ -282,6 +285,7 @@ new Vue({
 	    .toFixed(1);
 		
 	  this.levelofAppearance = num - 0 > this.maxLevelofAppearance ? this.maxLevelofAppearance : num;
+	  this.levelofAppearance = num - 0 < this.minLevelofAppearance ? this.minLevelofAppearance : num;
 	
 	},
     // 计算颜值前百分比
@@ -305,7 +309,7 @@ new Vue({
 	    .div(this.maxHumanheight)
 	    .times(this.humanheightStep)
 	    .times(100)
-	    .toFixed(1);
+	    .toFixed(0);
 	
 	  this.humanheightPercent = p - 0 > 100 ? 100 : p;
 	
@@ -392,37 +396,37 @@ new Vue({
 	},
 	
 	
-	// 计算家境
-	getParent() {
-	  // 计算百分比
-	  let p = new BigNumber(this.touchx)
-	    .div(this.$refs.progress.offsetWidth)
-	    .times(this.maxParent)
-	    .idiv(this.parentStep) //整除，保留0位小数
-	    .div(this.maxParent)
-	    .times(this.parentStep)
-	    .times(100)
-	    .toFixed(2);
+	// // 计算家境
+	// getParent() {
+	//   // 计算百分比
+	//   let p = new BigNumber(this.touchx)
+	//     .div(this.$refs.progress.offsetWidth)
+	//     .times(this.maxParent)
+	//     .idiv(this.parentStep) //整除，保留0位小数
+	//     .div(this.maxParent)
+	//     .times(this.parentStep)
+	//     .times(100)
+	//     .toFixed(2);
 	
-	  this.parentPercent = p - 0 > 100 ? 100 : p;
+	//   this.parentPercent = p - 0 > 100 ? 100 : p;
 	
-	  let num = new BigNumber(this.parentPercent)
-	    .div(100)
-	    .times(this.maxParent)
-	    .toFixed(0);			//小数点数
+	//   let num = new BigNumber(this.parentPercent)
+	//     .div(100)
+	//     .times(this.maxParent)
+	//     .toFixed(0);			//小数点数
 	  
-	  this.parent = num - 0 > this.maxParent ? this.maxParent : num;
-	},
-	// 计算家境前百分比
-	getparentPercent() {
+	//   this.parent = num - 0 > this.maxParent ? this.maxParent : num;
+	// },
+	// // 计算家境前百分比
+	// getparentPercent() {
 	
-	  let p = new BigNumber(this.parent)
-	    .div(this.maxParent)
-	    .times(100)
-	    .toFixed(2);
-	  this.parentPercent = p - 0 > 100 ? 100 : p;
+	//   let p = new BigNumber(this.parent)
+	//     .div(this.maxParent)
+	//     .times(100)
+	//     .toFixed(2);
+	//   this.parentPercent = p - 0 > 100 ? 100 : p;
 	
-	},
+	// },
 	
     // 通过移动滑块计算数值
     computedAmount(type = "annualIncome") {
