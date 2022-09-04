@@ -166,15 +166,8 @@ new Vue({
       return p.toFixed(8);
     },
     maleNum() {// 男性人数
-	  let  p11 = this.getGaussianPercent(this.age,30,240);
-	  let  p12 = this.getGaussianPercent(this.age*1.2,30,240);
-	  let  p1 = p12-p11;	//计算年龄段
-	  let  p2 = 1 - this.getGaussianPercent(this.humanheight,169,17);
-	  let  p3 = 1 - this.getGaussianPercent(this.education,5,2);
-	  let  p4 = 1 - this.getGaussianPercent(this.annualIncome,12.7,300);
-	  let  p5 = 1 - this.getGaussianPercent(this.parent,2,1);
-	  let  num  = p1*p2*p3*p4*p5*(689050000+34900000);	//全国男性比女性多3490万人
-      return num.toFixed(0);
+	  let  num  = BigNumber(this.male).times(689050000+34900000).toFixed(0)  //全国男性比女性多3490万人
+	  return num;
     },
     female() {// 女性比例
       let  p11 = this.getGaussianPercent(this.age,30,240);
@@ -189,16 +182,8 @@ new Vue({
       return p.toFixed(8);
     },
     femaleNum() {//女性人数
-      let  p11 = this.getGaussianPercent(this.age,30,240);
-  	  let  p12 = this.getGaussianPercent(this.age*1.2,30,240);
-  	  let  p1 = p12-p11;	//计算年龄段
-  	  let  p2 = 1 - this.getGaussianPercent(this.levelofAppearance,5-1,1.3);	//女性看男性的平均颜值普遍会认为丑，所以均值5-1
-  	  let  p3 = 1 - this.getGaussianPercent(this.humanheight,160,12);
-  	  let  p4 = 1 - this.getGaussianPercent(this.education,5,2);
-  	  let  p5 = 1 - this.getGaussianPercent(this.annualIncome,11.1,300);
-  	  let  p6 = 1 - this.getGaussianPercent(this.parent,2,1);
-  	  let  num = p1*p2*p3*p4*p5*p6*6689050000;;
-      return num.toFixed(0);
+	  let  num  = BigNumber(this.male).times(689050000).toFixed(0);
+	  return num;
     }
   },
   created() {
